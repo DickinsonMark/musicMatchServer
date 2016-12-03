@@ -6,7 +6,8 @@ const gameController = require('../controllers/game');
 router.post('/gameOver', function (req, res, next) {
   const {username, expGain} = req.body;
   gameController.addExperience(username, expGain, (err, data) => {
-    console.log(data);
+    if (err) res.json({message: err});
+    else res.json({message: data});
   });
 });
 
