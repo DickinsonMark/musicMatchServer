@@ -4,6 +4,7 @@ exports.up = function(knex, Promise) {
     table.text('username').notNullable().unique();
     table.string('password').notNullable();
     table.integer('experience').defaultTo(0);
+    table.integer('level').defaultTo(1);
   });
 };
 

@@ -1,12 +1,16 @@
 const knex = require('../db/connection.js');
+const bcrypt = require('bcrypt');
 
-function logIn(username, password, callBack) {
+function signIn(username, password, callBack) {
   knex('users')
   .where('username', username)
   .then((user) => {
-    console.log(user);
     if (user.length) {
-      callBack(null, user);
+      if (bcrypt.compareSync(password, user[0].password)) {
+        callBack(null, user);
+      } else {
+        callBack(null, 'No user');
+      }
     } else {
       callBack(null, 'No user');
     }
@@ -16,10 +20,24 @@ function logIn(username, password, callBack) {
 }
 
 function signUp(username, password, callBack) {
-  console.log('signUp');
+  bcrypt.hash(password, 13, (err, hash) => {
+    if (err) {
+      callBack(err);
+    } else {
+      let newUser = {
+        username: username,
+        password: hash
+      };
+      knex('users').insert(newUser).returning('*').then((user) => {
+        callBack(null, user);
+      }).catch((err) => {
+        callBack(err);
+      });
+    }
+  });
 }
 
 module.exports = {
-  logIn,
+  signIn,
   signUp
 };
